@@ -19,7 +19,7 @@
             font-family: 'Inter', sans-serif;
             color: #ffffff;
             overflow: hidden;
-            background-color: #000;
+            background-color: #003366;
         }
 
         #hero-canvas {
@@ -30,6 +30,8 @@
             height: 100%;
             object-fit: cover;
             z-index: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
         }
 
         /* Overlay mais escuro na esquerda e sumindo para a direita */
@@ -165,12 +167,26 @@
 
         // Preload
         let loadedImages = 0;
-        for (let i = 0; i < frameCount; i++) {
+
+        // Carrega a primeira imagem prioritariamente
+        const firstImg = new Image();
+        firstImg.onload = () => {
+            loadedImages++;
+            renderFrame(0);
+            canvas.style.opacity = '1';
+        };
+        firstImg.src = currentFrame(0);
+        images[0] = firstImg;
+
+        // Carrega o restante
+        for (let i = 1; i < frameCount; i++) {
             const img = new Image();
             img.onload = () => {
                 loadedImages++;
                 if (loadedImages === frameCount) {
-                    requestAnimationFrame(render);
+                    setTimeout(() => {
+                        requestAnimationFrame(animate);
+                    }, 500); // Pequeno delay para garantir fluidez
                 }
             };
             img.src = currentFrame(i);
@@ -180,13 +196,17 @@
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            if (images[0] && images[0].complete) {
+                renderFrame(animationState.frame);
+            }
         }
 
         window.addEventListener('resize', resize);
         resize();
 
-        function render() {
-            const img = images[animationState.frame];
+        function renderFrame(index) {
+            const img = images[index];
+            if (!img || !img.complete) return;
             
             // Draw image with "cover" behavior
             const imgRatio = img.width / img.height;
@@ -207,12 +227,15 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-            
+        }
+
+        function animate() {
+            renderFrame(animationState.frame);
             animationState.frame = (animationState.frame + 1) % frameCount;
 
-            // Controle de velocidade (ex: 12 fps)
+            // Controle de velocidade (ex: 18 fps)
             setTimeout(() => {
-                requestAnimationFrame(render);
+                requestAnimationFrame(animate);
             }, 1000 / 18)
         }
     </script>
