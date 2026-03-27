@@ -126,18 +126,27 @@
 
         @media (max-width: 768px) {
             .overlay {
-                background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 100%);
+                background: linear-gradient(
+                    0deg, 
+                    rgba(0, 0, 0, 0.8) 0%, 
+                    rgba(0, 0, 0, 0.4) 50%, 
+                    rgba(0, 0, 0, 0.2) 100%
+                );
             }
             .main-content {
                 align-items: center;
                 text-align: center;
-                padding: 0 2rem;
+                padding: 0 1.5rem;
+                justify-content: flex-start;
+                padding-top: 15vh;
             }
             h1 {
-                font-size: 3rem;
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
             }
             p {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
                 max-width: 100%;
             }
         }
@@ -221,7 +230,10 @@
             } else {
                 drawWidth = canvas.height * imgRatio;
                 drawHeight = canvas.height;
-                offsetX = (canvas.width - drawWidth) / 2;
+                // Alinha quase totalmente à direita no mobile para mostrar a jangada e a logo
+                // mas deixa uma pequena margem à esquerda (85% do deslocamento)
+                const isMobile = window.innerWidth <= 768;
+                offsetX = isMobile ? (canvas.width - drawWidth) * 0.70 : (canvas.width - drawWidth) / 2;
                 offsetY = 0;
             }
 
